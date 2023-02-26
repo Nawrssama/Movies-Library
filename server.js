@@ -1,55 +1,170 @@
 'use strict';
 
-//import the express framework
 const express = require('express');
-//import cors
 const cors = require('cors');
-const { get } = require('express/lib/response');
-
 const server = express();
-
-//server open for all clients requests
-server.use(cors());
-
+const axios = require('axios');
+const data = require('./movie_data/data.json');
+require("dotenv").config();
 const PORT = 3000;
 
-function Movie(title, poster_path, overview){
+server.use(cors());
+
+
+
+//construcrtor
+function Movie(title, poster_path, overview) {
     this.title = title
     this.poster_path = poster_path
     this.overview = overview
 }
 
+function Movies(id, title, release_date, poster_path, overview) {
+    this.id = id;
+    this.title = title;
+    this.release_date = release_date;
+    this.poster_path = poster_path;
+    this.overview = overview;
+}
 
-server.get('/',(req,res)=>{
-    let data = require('./movie_data/data.json');
+
+server.get('/', homeHandler);
+
+server.get('/favorite', favoriteHandler);
+
+server.get('/trending', trendingHandler);
+
+server.get("/search", searchHandler);
+
+server.get("/similerMovies", moviesHandler);
+
+server.get("/person", personHandler)
+
+server.get('*', defaultHandler);
+
+server.use(errorHandler);
+
+// http://localhost:3000
+function homeHandler(req, res) {
 
     let newMovie = new Movie(
-        data.title , data.poster_path , data.overview
+        data.title,
+        data.poster_path,
+        data.overview
     )
     res.status(200).send(newMovie);
-})
-
+}
 
 
 // http://localhost:3000/favorite
-server.get('/favorite',(req,res)=>{
+function favoriteHandler(req, res) {
     let str = "Welcome to Favorite Page";
     console.log("Hi from favorite page");
     res.status(200).send(str);
-})
+}
+
 
 //default route
-server.get('*',(req,res)=>{
+function defaultHandler(req, res) {
     let notFound = "this page does not exist  =("
     res.status(404).send(notFound);
-})
+}
 
-server.get('*',(req,res) =>{
-    let serverEr = "sorry.........internet server error"
-    res.status(500).send(serverEr);
-})
 
-server.listen(PORT, () =>{
+//trending route
+function trendingHandler(req, res) {
+    try {
+        const ABIKEY = process.env.ABIkey;
+        const url = `https://api.themoviedb.org/3/trending/all/day?api_key=${ABIKEY}`;
+        axios.get(url)
+            .then((result) => {
+                let mapResult = result.data.results.map((item) => {
+                    let singleMovie = new Movies(item.id, item.title, item.release_date, item.poster_path, item.overview);
+                    return singleMovie;
+                })
+                res.send(mapResult);
+            })
+            .catch((error) => {
+                res.status(500).send(error);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
+
+
+//search route
+function searchHandler(req, res) {
+    try {
+        const ABIKEY = process.env.ABIkey;
+        const url2 = `https://api.themoviedb.org/3/search/movie?api_key=${ABIKEY}&language=en-US&query=spider%20man&page=2`;
+        axios.get(url2)
+            .then((result2) => {
+                let mapResult2 = result2.data.results;
+                res.send(mapResult2);
+            })
+            .catch((error) => {
+                res.status(500).send(error);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
+
+
+//get similer movies
+function moviesHandler(req, res) {
+    try {
+        const ABIKEY = process.env.ABIkey;
+        const url3 = `https://api.themoviedb.org/3/movie/155/similar?api_key=${ABIKEY}&language=en-US&page=1`;
+        axios.get(url3)
+            .then((result3) => {
+                let movies = result3.data;
+                res.send(movies);
+            })
+            .catch((error) => {
+                res.status(500).send(error);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
+
+function personHandler(req, res) {
+    try {
+        const ABIKEY = process.env.ABIkey;
+        const url4 = `https://api.themoviedb.org/3/person/3894?api_key=${ABIKEY}&language=en-US`;
+        axios.get(url4)
+            .then((result4) => {
+                let person = result4.data;
+                res.send(person);
+            })
+            .catch((error) => {
+                res.status(500).send(error);
+            })
+    }
+    catch (error) {
+        errorHandler(error, req, res);
+    }
+}
+
+
+
+// midlleware functions 
+function errorHandler(error, req, res) {
+    const err = {
+        status: 500,
+        massage: error
+    }
+    res.status(500).send(err);
+}
+
+
+//for checking the code on terminal 
+server.listen(PORT, () => {
     console.log(`listening on ${PORT} : I am ready`);
 })
 
