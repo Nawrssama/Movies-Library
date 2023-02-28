@@ -32,3 +32,10 @@ and how to handle an error
 
 # WRRC OF API SERVER
 ![alt text](./image/wrrc2.png)
+
+# lab13 databases
+in this lab i learned how to add a database and how to store it  
+
+# wrrc of database 
+![alt text](./image/wrrc3.png)
+
