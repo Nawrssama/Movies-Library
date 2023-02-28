@@ -6,9 +6,14 @@ const server = express();
 const axios = require('axios');
 const data = require('./movie_data/data.json');
 require("dotenv").config();
-const PORT = 3000;
+const pg = require('pg');
 
 server.use(cors());
+server.use(express.json());
+
+const PORT = 3000;
+
+const client = new pg.Client(process.env.DATABASE_URL);
 
 
 
@@ -38,7 +43,11 @@ server.get("/search", searchHandler);
 
 server.get("/similerMovies", moviesHandler);
 
-server.get("/person", personHandler)
+server.get("/person", personHandler);
+
+server.get('/mymovies', getmymoviesHandler);
+
+server.post('/mymovies', addmymoviesHandler);
 
 server.get('*', defaultHandler);
 
@@ -152,6 +161,31 @@ function personHandler(req, res) {
 }
 
 
+function getmymoviesHandler(req, res) {
+    // return all my movies (mymovies table content)
+    const sql = `SELECT * FROM mymovies`;
+    client.query(sql)
+    .then((data)=>{
+        res.send(data.rows);
+    })
+    .catch((error)=>{
+        errorHandler(error, req, res);
+    })
+}
+
+function addmymoviesHandler(req,res) {
+    const movie = req.body;
+    const sql = `INSERT INTO mymovies (movie_name, movie_time, releas_date, overview, main_language, recomanded_age)
+    VALUES ('${movie.movie_name}', '${movie.movie_time}', '${movie.releas_date}', '${movie.overview}', '${movie.main_language}', '${movie.recomanded_age}');`;
+    client.query(sql)
+    .then((data)=>{
+        res.send("your data was added !");
+    })
+    .catch((error)=>{
+        errorHandler(error,req,res);
+    })
+}
+
 
 // midlleware functions 
 function errorHandler(error, req, res) {
@@ -162,9 +196,13 @@ function errorHandler(error, req, res) {
     res.status(500).send(err);
 }
 
+client.connect()
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(`listening on ${PORT} : I am ready`);
+        });
+
+    })
 
 //for checking the code on terminal 
-server.listen(PORT, () => {
-    console.log(`listening on ${PORT} : I am ready`);
-})
 
