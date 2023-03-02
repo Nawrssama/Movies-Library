@@ -39,3 +39,12 @@ in this lab i learned how to add a database and how to store it
 # wrrc of database 
 ![alt text](./image/wrrc3.png)
 
+
+# lab14 CRUD
+in this lab i learned how to CRUD which mean creat and get and update and delete  
+
+# wrrc of CRUD 
+![alt text](./image/WRRC%20CRUD.png)
+
+
+

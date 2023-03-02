@@ -47,7 +47,13 @@ server.get("/person", personHandler);
 
 server.get('/mymovies', getmymoviesHandler);
 
+server.get('/mymovies/:id', getmymoviesidHandler);
+
 server.post('/mymovies', addmymoviesHandler);
+
+server.delete('/mymovies/:id', deletemymovie);
+
+server.put('/mymovies/:id', updatemymovie);
 
 server.get('*', defaultHandler);
 
@@ -107,7 +113,7 @@ function trendingHandler(req, res) {
 function searchHandler(req, res) {
     try {
         const ABIKEY = process.env.ABIkey;
-        const url2 = `https://api.themoviedb.org/3/search/movie?api_key=${ABIKEY}&language=en-US&query=spider%20man&page=2`;
+        const url2 = `https://api.themoviedb.org/3/search/movie?api_key=${ABIKEY}&language=en-US&query=spider%20man&page=1`;
         axios.get(url2)
             .then((result2) => {
                 let mapResult2 = result2.data.results;
@@ -160,10 +166,24 @@ function personHandler(req, res) {
     }
 }
 
-
 function getmymoviesHandler(req, res) {
     // return all my movies (mymovies table content)
+    const id = req.params.id;
     const sql = `SELECT * FROM mymovies`;
+    client.query(sql)
+    .then((data)=>{
+        res.send(data.rows);
+    })
+    .catch((error)=>{
+        errorHandler(error, req, res);
+    })
+}
+
+
+function getmymoviesidHandler(req, res) {
+    // return all my movies (mymovies table content)
+    const id = req.params.id;
+    const sql = `SELECT * FROM mymovies WHERE id=${id} `;
     client.query(sql)
     .then((data)=>{
         res.send(data.rows);
@@ -176,13 +196,38 @@ function getmymoviesHandler(req, res) {
 function addmymoviesHandler(req,res) {
     const movie = req.body;
     const sql = `INSERT INTO mymovies (movie_name, movie_time, releas_date, overview, main_language, recomanded_age)
-    VALUES ('${movie.movie_name}', '${movie.movie_time}', '${movie.releas_date}', '${movie.overview}', '${movie.main_language}', '${movie.recomanded_age}');`;
+    VALUES ('${movie.movie_name}', '${movie.movie_time}', '${movie.releas_date}', '${movie.overview}', '${movie.main_language}', '${movie.recomanded_age}') RETURNING *;`;
     client.query(sql)
     .then((data)=>{
-        res.send("your data was added !");
+        res.send(data.rows);
     })
     .catch((error)=>{
         errorHandler(error,req,res);
+    })
+}
+
+function deletemymovie(req,res) {
+    const id = req.params.id;
+    const sql = `DELETE FROM mymovies WHERE id=${id}`;
+    client.query(sql)
+    .then((data)=>{
+        res.status(204).json({});
+    })
+    .catch((err)=>{
+        errorHandler(err,req,res);
+    })
+}
+
+function updatemymovie(req,res) {
+    const id = req.params.id;
+    const sql = `UPDATE mymovies SET movie_name=$1, movie_time=$2, releas_date=$3, overview=$4, main_language=$5, recomanded_age=$6 WHERE id=${id} RETURNING *`;
+    const values = [req.body.movie_name,req.body.movie_time,req.body.releas_date,req.body.overview,req.body.main_language,req.body.recomanded_age];
+    client.query(sql,values)
+    .then((data)=>{
+        res.status(200).send(data.rows);
+    })
+    .catch((err)=>{
+        errorHandler(err,req,res);
     })
 }
 
