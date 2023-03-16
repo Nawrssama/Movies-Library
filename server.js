@@ -198,7 +198,7 @@ function addmymoviesHandler(req,res) {
     const movie = req.body;
    
     const sql = `INSERT INTO mymovies (title,release_date,poster_path,overview,comment)
-    VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}'.'${movie.comment}') RETURNING *;`
+    VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}','${movie.comment}') RETURNING *;`
 
     client.query(sql)
     .then((data)=>{
