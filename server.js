@@ -49,11 +49,11 @@ server.get('/mymovies', getmymoviesHandler);
 
 server.get('/mymovies/:id', getmymoviesidHandler);
 
-server.post('/mymovies', addmymoviesHandler);
+server.post('/addMovie', addmymoviesHandler);
 
-server.delete('/mymovies/:id', deletemymovie);
+server.delete('/delete/:id', deletemymovie);
 
-server.put('/mymovies/:id', updatemymovie);
+server.put('/update/:id', updatemymovie);
 
 server.get('*', defaultHandler);
 
@@ -167,6 +167,7 @@ function personHandler(req, res) {
 }
 
 function getmymoviesHandler(req, res) {
+    console.log("sendet =)")
     // return all my movies (mymovies table content)
     const id = req.params.id;
     const sql = `SELECT * FROM mymovies`;
@@ -195,8 +196,10 @@ function getmymoviesidHandler(req, res) {
 
 function addmymoviesHandler(req,res) {
     const movie = req.body;
-    const sql = `INSERT INTO mymovies (movie_name, movie_time, releas_date, overview, main_language, recomanded_age)
-    VALUES ('${movie.movie_name}', '${movie.movie_time}', '${movie.releas_date}', '${movie.overview}', '${movie.main_language}', '${movie.recomanded_age}') RETURNING *;`;
+   
+    const sql = `INSERT INTO mymovies (title,release_date,poster_path,overview,comment)
+    VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}'.'${movie.comment}') RETURNING *;`
+
     client.query(sql)
     .then((data)=>{
         res.send(data.rows);
@@ -220,8 +223,9 @@ function deletemymovie(req,res) {
 
 function updatemymovie(req,res) {
     const id = req.params.id;
-    const sql = `UPDATE mymovies SET movie_name=$1, movie_time=$2, releas_date=$3, overview=$4, main_language=$5, recomanded_age=$6 WHERE id=${id} RETURNING *`;
-    const values = [req.body.movie_name,req.body.movie_time,req.body.releas_date,req.body.overview,req.body.main_language,req.body.recomanded_age];
+    const sql = `INSERT INTO firstmov (title,release_date,poster_path,overview,comment)
+    VALUES ('${mov.title}','${mov.release_date}','${mov.poster_path}','${mov.overview}'.'${mov.comment}') RETURNING *;`
+    
     client.query(sql,values)
     .then((data)=>{
         res.status(200).send(data.rows);
