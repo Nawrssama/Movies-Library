@@ -11,7 +11,7 @@ const pg = require('pg');
 server.use(cors());
 server.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 const client = new pg.Client(process.env.DATABASE_URL);
 
@@ -223,10 +223,12 @@ function deletemymovie(req,res) {
 
 function updatemymovie(req,res) {
     const id = req.params.id;
-    const sql = `INSERT INTO firstmov (title,release_date,poster_path,overview,comment)
-    VALUES ('${mov.title}','${mov.release_date}','${mov.poster_path}','${mov.overview}'.'${mov.comment}') RETURNING *;`
+    const movie = req.body;
+
+    const sql = `UPDATE mymovies SET title ='${movie.title}', release_date ='${movie.release_date}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
+
     
-    client.query(sql,values)
+    client.query(sql)
     .then((data)=>{
         res.status(200).send(data.rows);
     })
