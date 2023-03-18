@@ -172,12 +172,12 @@ function getmymoviesHandler(req, res) {
     const id = req.params.id;
     const sql = `SELECT * FROM mymovies`;
     client.query(sql)
-    .then((data)=>{
-        res.send(data.rows);
-    })
-    .catch((error)=>{
-        errorHandler(error, req, res);
-    })
+        .then((data) => {
+            res.send(data.rows);
+        })
+        .catch((error) => {
+            errorHandler(error, req, res);
+        })
 }
 
 
@@ -186,55 +186,63 @@ function getmymoviesidHandler(req, res) {
     const id = req.params.id;
     const sql = `SELECT * FROM mymovies WHERE id=${id} `;
     client.query(sql)
-    .then((data)=>{
-        res.send(data.rows);
-    })
-    .catch((error)=>{
-        errorHandler(error, req, res);
-    })
+        .then((data) => {
+            res.send(data.rows);
+        })
+        .catch((error) => {
+            errorHandler(error, req, res);
+        })
 }
 
-function addmymoviesHandler(req,res) {
+function addmymoviesHandler(req, res) {
     const movie = req.body;
-   
+
     const sql = `INSERT INTO mymovies (title,release_date,poster_path,overview,comment)
     VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}','${movie.comment}') RETURNING *;`
 
     client.query(sql)
-    .then((data)=>{
-        res.send(data.rows);
-    })
-    .catch((error)=>{
-        errorHandler(error,req,res);
-    })
+        .then((data) => {
+            res.send(data.rows);
+        })
+        .catch((error) => {
+            errorHandler(error, req, res);
+        })
 }
 
-function deletemymovie(req,res) {
+function deletemymovie(req, res) {
     const id = req.params.id;
     const sql = `DELETE FROM mymovies WHERE id=${id}`;
     client.query(sql)
-    .then((data)=>{
-        res.status(204).json({});
-    })
-    .catch((err)=>{
-        errorHandler(err,req,res);
-    })
+        .then((data) => {
+            res.status(204).json({});
+        })
+        .catch((err) => {
+            errorHandler(err, req, res);
+        })
 }
 
-function updatemymovie(req,res) {
+function updatemymovie(req, res) {
     const id = req.params.id;
     const movie = req.body;
 
     const sql = `UPDATE mymovies SET title ='${movie.title}', release_date ='${movie.release_date}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
 
-    
+
     client.query(sql)
-    .then((data)=>{
-        res.status(200).send(data.rows);
-    })
-    .catch((err)=>{
-        errorHandler(err,req,res);
-    })
+        .then((data) => {
+            const sql = `SELECT * FROM mymovies`;
+            client.query(sql)
+                .then((data) => {
+                    res.send(data.rows);
+                })
+                .catch((error) => {
+                    errorHandler(error, req, res);
+                })
+            // res.status(200).send(data.rows);
+        })
+        .catch((err) => {
+            errorHandler(err, req, res);
+        })
 }
 
 
