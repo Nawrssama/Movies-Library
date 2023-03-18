@@ -94,7 +94,7 @@ function trendingHandler(req, res) {
         axios.get(url)
             .then((result) => {
                 let mapResult = result.data.results.map((item) => {
-                    let singleMovie = new Movies(item.id, item.title, item.release_date, item.poster_path, item.overview);
+                    let singleMovie = new Movies(item.id, item.title, item.release_date, item.poster_path, item.overview, item.name);
                     return singleMovie;
                 })
                 res.send(mapResult);
@@ -214,7 +214,15 @@ function deletemymovie(req, res) {
     const sql = `DELETE FROM mymovies WHERE id=${id}`;
     client.query(sql)
         .then((data) => {
-            res.status(204).json({});
+            const sql = `SELECT * FROM mymovies`;
+            client.query(sql)
+                .then((data) => {
+                    res.send(data.rows);
+                })
+                .catch((error) => {
+                    errorHandler(error, req, res);
+                })
+            // res.status(204).json({});
         })
         .catch((err) => {
             errorHandler(err, req, res);
