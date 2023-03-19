@@ -24,7 +24,7 @@ function Movie(title, poster_path, overview) {
     this.overview = overview
 }
 
-function Movies(id, title, release_date, poster_path, overview,name) {
+function Movies(id, title, release_date, poster_path, overview, name) {
     this.id = id;
     this.title = title || name;
     this.release_date = release_date;
@@ -94,7 +94,7 @@ function trendingHandler(req, res) {
         axios.get(url)
             .then((result) => {
                 let mapResult = result.data.results.map((item) => {
-                    let singleMovie = new Movies(item.id, item.title, item.release_date, item.poster_path, item.overview);
+                    let singleMovie = new Movies(item.id, item.title, item.name, item.release_date, item.poster_path, item.overview);
                     return singleMovie;
                 })
                 res.send(mapResult);
@@ -229,14 +229,38 @@ function deletemymovie(req, res) {
         })
 }
 
+// function updatemymovie(req, res) {
+//     const id = req.params.id;
+//     const movie = req.body;
+
+//     const sql = `UPDATE mymovies SET title ='${movie.title}', release_date ='${movie.release_date}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
+
+
+//     client.query(sql)
+//         .then((data) => {
+//             const sql = `SELECT * FROM mymovies`;
+//             client.query(sql)
+//                 .then((data) => {
+//                     res.send(data.rows);
+//                 })
+//                 .catch((error) => {
+//                     errorHandler(error, req, res);
+//                 })
+//             // res.status(200).send(data.rows);
+//         })
+//         .catch((err) => {
+//             errorHandler(err, req, res);
+//         })
+// }
+
 function updatemymovie(req, res) {
     const id = req.params.id;
     const movie = req.body;
 
-    const sql = `UPDATE mymovies SET title ='${movie.title}', release_date ='${movie.release_date}', name ='${movie.name}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
+    const sql = `UPDATE mymovies SET title=$1, release_date=$2, poster_path=$3, overview=$4, comment=$5 WHERE id=${id} RETURNING *`;
+    const values = [movie.title, movie.release_date, movie.poster_path, movie.overview, movie.comment];
 
-
-    client.query(sql)
+    client.query(sql, values)
         .then((data) => {
             const sql = `SELECT * FROM mymovies`;
             client.query(sql)
@@ -246,11 +270,10 @@ function updatemymovie(req, res) {
                 .catch((error) => {
                     errorHandler(error, req, res);
                 })
-            // res.status(200).send(data.rows);
         })
         .catch((err) => {
             errorHandler(err, req, res);
-        })
+        });
 }
 
 
