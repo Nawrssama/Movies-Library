@@ -24,9 +24,9 @@ function Movie(title, poster_path, overview) {
     this.overview = overview
 }
 
-function Movies(id, title, release_date, poster_path, overview) {
+function Movies(id, title, release_date, poster_path, overview,name) {
     this.id = id;
-    this.title = title;
+    this.title = title || name;
     this.release_date = release_date;
     this.poster_path = poster_path;
     this.overview = overview;
@@ -233,7 +233,7 @@ function updatemymovie(req, res) {
     const id = req.params.id;
     const movie = req.body;
 
-    const sql = `UPDATE mymovies SET title ='${movie.title}', release_date ='${movie.release_date}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
+    const sql = `UPDATE mymovies SET title ='${movie.title}', release_date ='${movie.release_date}', name ='${movie.name}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
 
 
     client.query(sql)
