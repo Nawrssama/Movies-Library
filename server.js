@@ -64,6 +64,7 @@ function homeHandler(req, res) {
 
     let newMovie = new Movie(
         data.title,
+        data.name,
         data.poster_path,
         data.overview
     )
@@ -198,7 +199,7 @@ function addmymoviesHandler(req, res) {
     const movie = req.body;
 
     const sql = `INSERT INTO mymovies (title,release_date,poster_path,overview,comment)
-    VALUES ('${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}','${movie.comment}') RETURNING *;`
+    VALUES ('${movie.title}','${movie.name}','${movie.release_date}','${movie.poster_path}','${movie.overview}','${movie.comment}') RETURNING *;`
 
     client.query(sql)
         .then((data) => {
@@ -233,7 +234,7 @@ function updatemymovie(req, res) {
     const id = req.params.id;
     const movie = req.body;
 
-    const sql = `UPDATE mymovies SET title ='${movie.title}', release_date ='${movie.release_date}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
+    const sql = `UPDATE mymovies SET title ='${movie.title}', name ='${movie.name}', release_date ='${movie.release_date}', poster_path ='${movie.poster_path}', overview ='${movie.overview}', comment ='${movie.comment}' WHERE id= ${id} RETURNING *;`
 
 
     client.query(sql)
