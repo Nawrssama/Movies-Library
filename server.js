@@ -94,10 +94,10 @@ function trendingHandler(req, res) {
         axios.get(url)
             .then((result) => {
                 let mapResult = result.data.results.map((item) => {
-                    let singleMovie = new Movies(item.id, item.title, item.name, item.release_date, item.poster_path, item.overview);
+                    let singleMovie = new Movies(item.id, item.title, item.release_date, item.poster_path, item.overview);
                     return singleMovie;
                 })
-                res.send(mapResult);
+                res.json(mapResult);
             })
             .catch((error) => {
                 res.status(500).send(error);
